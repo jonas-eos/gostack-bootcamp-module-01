@@ -7,14 +7,15 @@ const server = express();
 /**
  * Set a router to http://server:listen_port/teste
  *
- * @param HTTP::__request
+ * @param { Query } HTTP::__request
  * @param __response
  *
- * @return  json { array __response }
+ * @return  json { query.name __response }
  */
 
-server.get("/teste", (__request, __response) => {
-  return __response.json({ message: "Hello World" });
+server.get("/users", (__request, __response) => {
+  const name = __request.query.name;
+  return __response.json({ message: `Hello ${name}` });
 });
 
 // Start a server on port 9090
