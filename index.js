@@ -49,5 +49,20 @@ server.post("/user/add", (__request, __response) => {
   return __response.json(users);
 });
 
+/**
+ * Set a router to http://server:listen_port/user/edit/:id
+ *
+ * @param { body } HTTP::__request
+ * @param __response
+ *
+ * @return  json { all users }
+ */
+server.put("/user/edit/:id", (__request, __response) => {
+  const { id } = __request.params;
+  const { name } = __request.body;
+  users[id] = name;
+  return __response.json(users);
+});
+
 // Start a server on port 9090
 server.listen(9090);
