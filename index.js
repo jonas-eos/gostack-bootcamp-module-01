@@ -68,6 +68,7 @@ function userAvailable(__request, __response, __next) {
 
 /**
  * Set a router to http://server:listen_port/users
+ * List all users from users sample array
  *
  * @param HTTP::__request
  * @param __response
@@ -80,6 +81,7 @@ server.get("/users", (__request, __response) => {
 
 /**
  * Set a router to http://server:listen_port/user
+ * Router to show only one user
  *
  * @param { Query } HTTP::__request
  * @param __response
@@ -93,6 +95,7 @@ server.get("/user", userAvailable, (__request, __response) => {
 
 /**
  * Set a router to http://server:listen_port/user/add
+ * Router to add a new user
  *
  * @param { body } HTTP::__request
  * @param __response
@@ -107,6 +110,7 @@ server.post("/user/add", checkUserNameExists, (__request, __response) => {
 
 /**
  * Set a router to http://server:listen_port/user/edit/:id
+ * Router to edit an user
  *
  * @param { body } HTTP::__request
  * @param __response
@@ -127,6 +131,7 @@ server.put(
 
 /**
  * Set a router to http://server:listen_port/user/delete/:id
+ * Router to delete an user from users sample array
  *
  * @param { param } HTTP::__request
  * @param __response
@@ -141,6 +146,7 @@ server.delete("/user/delete/:id", userAvailable, (__request, __response) => {
 
 /**
  * Set a router to http://server:listen_port/users/:id
+ * Router to show a simple sample with params manipulation.
  *
  * @param { Query } HTTP::__request
  * @param __response
