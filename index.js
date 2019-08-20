@@ -4,6 +4,9 @@ const express = require("express");
 // Create a new object from express
 const server = express();
 
+// Set server to allow HTTP::post json
+server.use(express.json());
+
 // User array sample
 const users = ["Jonas", "Diego", "Marcela", "Andressa"];
 
@@ -30,6 +33,20 @@ server.get("/users", (__request, __response) => {
 server.get("/user", (__request, __response) => {
   const { id } = __request.query;
   return __response.json({ message: `Hello ${users[id]}` });
+});
+
+/**
+ * Set a router to http://server:listen_port/user/add
+ *
+ * @param { body } HTTP::__request
+ * @param __response
+ *
+ * @return  json { all users }
+ */
+server.post("/user/add", (__request, __response) => {
+  const { name } = __request.body;
+  users.push(name);
+  return __response.json(users);
 });
 
 // Start a server on port 9090
