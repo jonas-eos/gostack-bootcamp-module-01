@@ -64,5 +64,19 @@ server.put("/user/edit/:id", (__request, __response) => {
   return __response.json(users);
 });
 
+/**
+ * Set a router to http://server:listen_port/user/delete/:id
+ *
+ * @param { param } HTTP::__request
+ * @param __response
+ *
+ * @return  json { all users }
+ */
+server.delete("/user/delete/:id", (__request, __response) => {
+  const { id } = __request.params;
+  users.splice(id, 1);
+  return __response.json(users);
+});
+
 // Start a server on port 9090
 server.listen(9090);
