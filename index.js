@@ -4,6 +4,9 @@ const express = require("express");
 // Create a new object from express
 const server = express();
 
+// User array sample
+const users = ["Jonas", "Diego", "Marcela", "Andressa"];
+
 /**
  * Set a router to http://server:listen_port/teste
  *
