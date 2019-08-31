@@ -18,7 +18,7 @@ const users = ["Jonas", "Diego", "Marcela", "Andressa"];
  *
  * @return  void
  */
-server.use((req, res, next) => {
+server.use((req, _, next) => {
   console.time("Request");
   console.log(`Method: ${req.method}; URL: ${req.url}`);
   next();
@@ -30,8 +30,8 @@ server.use((req, res, next) => {
  *
  * @return  error | call next router
  */
-function userBodyExist(req, res, next) {
-  const userName = users[req.body.name];
+function nameBodyExists(req, res, next) {
+  const userName = req.body.name;
   if (userName) {
     req.userName = userName;
     return next();
@@ -43,22 +43,57 @@ function userBodyExist(req, res, next) {
 }
 
 /**
+ * Get important request informations.
+ */
+function getReqInformations(req, _, next) {
+  req.user = users[req.params.index];
+  req.index = req.params.index;
+  return next();
+}
+
+/**
  * Validade if user exist.
  *
  * @return  error | call next router
  */
 function userExists(req, res, next) {
-  const user = users[req.query.id];
-  const { index } = req.params;
-  if (user) {
-    req.user = user;
-    req.index = index;
+  if (users[req.index]) {
     return next();
   } else {
     return res.status(400).json({
       error: "User does not exists!"
     });
   }
+}
+
+/**
+ * Push a new user on users array
+ *
+ * @return The new user added to user array.
+ */
+function createUser(__userName) {
+  users.push(__userName);
+  return __userName;
+}
+
+/**
+ * Update the username.
+ *
+ * @return the new user name.
+ */
+function updateUserName(__index, __userName) {
+  users[__index] = __userName;
+  return __userName;
+}
+
+/**
+ * Delete a user from users array.
+ *
+ * @return sucess
+ */
+function deleteUser(__index) {
+  users.splice(__index, 1);
+  return "sucess";
 }
 
 /**
@@ -71,75 +106,48 @@ server.get("/users", (req, res) => {
 });
 
 /**
- * Set a router to http://server:listen_port/user
- * Router to show only one user
+ * Get a user from users array and show their name.
  *
- * @param { Query } HTTP::req
- * @param res
- *
- * @return  json { query.name res }
+ * @return  User name.
  */
-server.get("/user", userExists, (req, res) => {
-  const { id } = req.query;
-  return res.json({ message: `Hello ${users[id]}` });
+server.get("/users/:index", getReqInformations, userExists, (req, res) => {
+  return res.json({ name: `${req.user}` });
 });
 
 /**
- * Set a router to http://server:listen_port/user/add
- * Router to add a new user
+ * Add a new user.
  *
- * @param { body } HTTP::req
- * @param res
- *
- * @return  json { all users }
+ * @return  New user name.
  */
-server.post("/user/add", userBodyExist, (req, res) => {
-  const { name } = req.body;
-  users.push(name);
-  return res.json(users);
+server.post("/user/add", getReqInformations, nameBodyExists, (req, res) => {
+  return res.json(createUser(req.userName));
 });
 
 /**
- * Set a router to http://server:listen_port/user/edit/:id
- * Router to edit an user
+ * Search a user from index, and update their name.
  *
- * @param { body } HTTP::req
- * @param res
- *
- * @return  json { all users }
+ * @return  New username.
  */
-server.put("/user/edit/:id", userBodyExist, userExists, (req, res) => {
-  const { id } = req.params;
-  const { name } = req.body;
-  users[id] = name;
-  return res.json(users);
-});
+server.put(
+  "/user/:index/edit",
+  getReqInformations,
+  userExists,
+  nameBodyExists,
+  (req, res) => {
+    return res.json(updateUserName(req.index, req.userName));
+  }
+);
 
 /**
- * Set a router to http://server:listen_port/user/delete/:id
  * Router to delete an user from users sample array
  *
- * @param { param } HTTP::req
- * @param res
- *
- * @return  json { all users }
+ * @return void
  */
-server.delete("/user/delete/:id", userExists, (req, res) => {
-  const { id } = req.params;
-  users.splice(id, 1);
-  return res.json(users);
-});
-
-/**
- * Set a router to http://server:listen_port/users/:id
- * Router to show a simple sample with params manipulation.
- *
- * @param { Query } HTTP::req
- * @param res
- *
- * @return  json { param.id res }
- */
-server.get("/users/:id", (req, res) => {
-  const { id } = req.params;
-  return res.json({ message: `Looking for user id:  ${id}` });
-});
+server.delete(
+  "/user/:index/delete",
+  getReqInformations,
+  userExists,
+  (req, res) => {
+    return res.json(deleteUser(req.index));
+  }
+);
