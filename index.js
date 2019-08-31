@@ -7,156 +7,139 @@ const server = express();
 // Set server to allow HTTP::post json
 server.use(express.json());
 
+// Start a server on port 9090
+server.listen(3333);
+
 // User array sample
 const users = ["Jonas", "Diego", "Marcela", "Andressa"];
 
 /**
  * Middleware::Log control purpose
  *
- * @param HTTP::__request
- * @param __response
- * @param __next
- *
  * @return  void
  */
-server.use((__request, __response, __next) => {
+server.use((req, res, next) => {
   console.time("Request");
-  console.log(`Method: ${__request.method}; URL: ${__request.url}`);
-  __next();
+  console.log(`Method: ${req.method}; URL: ${req.url}`);
+  next();
   console.timeEnd("Request");
 });
 
 /**
  * Validade if name exist on HTTP::request
- * if does not exist, catch a error status 400
- *
- * @param HTTP::__request
- * @param __response
- * @param __next
  *
  * @return  error | call next router
  */
-function checkUserNameExists(__request, __response, __next) {
-  if (!__request.body.name) {
-    return __response.status(400).json({
-      error: "User not found on request body!"
+function userBodyExist(req, res, next) {
+  const userName = users[req.body.name];
+  if (userName) {
+    req.userName = userName;
+    return next();
+  } else {
+    return res.status(400).json({
+      error: "Username is required!"
     });
   }
-  return __next();
 }
 
 /**
- * Validade if user exist on users constant sample
- * if does not exist, catch a error status 400
- *
- * @param HTTP::__request
- * @param __response
- * @param __next
+ * Validade if user exist.
  *
  * @return  error | call next router
  */
-function userAvailable(__request, __response, __next) {
-  const qId = __request.query.id;
-  const pId = __request.params.id;
-  if (!users[pId] && !users[qId]) {
-    return __response.status(400).json({
+function userExists(req, res, next) {
+  const user = users[req.query.id];
+  const { index } = req.params;
+  if (user) {
+    req.user = user;
+    req.index = index;
+    return next();
+  } else {
+    return res.status(400).json({
       error: "User does not exists!"
     });
   }
-  return __next();
 }
 
 /**
- * Set a router to http://server:listen_port/users
  * List all users from users sample array
  *
- * @param HTTP::__request
- * @param __response
- *
- * @return  json { return all users }
+ * @return  All users
  */
-server.get("/users", (__request, __response) => {
-  return __response.json(users);
+server.get("/users", (req, res) => {
+  return res.json(users);
 });
 
 /**
  * Set a router to http://server:listen_port/user
  * Router to show only one user
  *
- * @param { Query } HTTP::__request
- * @param __response
+ * @param { Query } HTTP::req
+ * @param res
  *
- * @return  json { query.name __response }
+ * @return  json { query.name res }
  */
-server.get("/user", userAvailable, (__request, __response) => {
-  const { id } = __request.query;
-  return __response.json({ message: `Hello ${users[id]}` });
+server.get("/user", userExists, (req, res) => {
+  const { id } = req.query;
+  return res.json({ message: `Hello ${users[id]}` });
 });
 
 /**
  * Set a router to http://server:listen_port/user/add
  * Router to add a new user
  *
- * @param { body } HTTP::__request
- * @param __response
+ * @param { body } HTTP::req
+ * @param res
  *
  * @return  json { all users }
  */
-server.post("/user/add", checkUserNameExists, (__request, __response) => {
-  const { name } = __request.body;
+server.post("/user/add", userBodyExist, (req, res) => {
+  const { name } = req.body;
   users.push(name);
-  return __response.json(users);
+  return res.json(users);
 });
 
 /**
  * Set a router to http://server:listen_port/user/edit/:id
  * Router to edit an user
  *
- * @param { body } HTTP::__request
- * @param __response
+ * @param { body } HTTP::req
+ * @param res
  *
  * @return  json { all users }
  */
-server.put(
-  "/user/edit/:id",
-  checkUserNameExists,
-  userAvailable,
-  (__request, __response) => {
-    const { id } = __request.params;
-    const { name } = __request.body;
-    users[id] = name;
-    return __response.json(users);
-  }
-);
+server.put("/user/edit/:id", userBodyExist, userExists, (req, res) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  users[id] = name;
+  return res.json(users);
+});
 
 /**
  * Set a router to http://server:listen_port/user/delete/:id
  * Router to delete an user from users sample array
  *
- * @param { param } HTTP::__request
- * @param __response
+ * @param { param } HTTP::req
+ * @param res
  *
  * @return  json { all users }
  */
-server.delete("/user/delete/:id", userAvailable, (__request, __response) => {
-  const { id } = __request.params;
+server.delete("/user/delete/:id", userExists, (req, res) => {
+  const { id } = req.params;
   users.splice(id, 1);
-  return __response.json(users);
+  return res.json(users);
 });
 
 /**
  * Set a router to http://server:listen_port/users/:id
  * Router to show a simple sample with params manipulation.
  *
- * @param { Query } HTTP::__request
- * @param __response
+ * @param { Query } HTTP::req
+ * @param res
  *
- * @return  json { param.id __response }
+ * @return  json { param.id res }
  */
-server.get("/users/:id", (__request, __response) => {
-  const { id } = __request.params;
-  return __response.json({ message: `Looking for user id:  ${id}` });
+server.get("/users/:id", (req, res) => {
+  const { id } = req.params;
+  return res.json({ message: `Looking for user id:  ${id}` });
 });
-
-// Start a server on port 9090
-server.listen(9090);
