@@ -7,9 +7,11 @@
     "start": "nodemon index.js"
   },
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "sucrase": "^3.10.1"
   },
   "devDependencies": {
+    "eslint": "^6.3.0",
     "nodemon": "^1.19.1"
   }
 }

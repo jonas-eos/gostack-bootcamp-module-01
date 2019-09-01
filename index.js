@@ -1,5 +1,5 @@
 // All dependencies are added on a variable with require method(<dependece-name>)
-const express = require("express");
+import express from "express";
 
 // Create a new object from express
 const server = express();
