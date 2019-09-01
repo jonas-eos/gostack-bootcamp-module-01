@@ -16,7 +16,8 @@ const users = ['Jonas', 'Diego', 'Marcela', 'Andressa'];
 
 /**
  * @method nameBodyExists
- * Validade if name exist on HTTP::request
+ * Get the name attribute on request body. Check if exist a name and set request
+ * userName attribute. Else, return a erro to the user.
  *
  * @return  error | call next router
  */
@@ -33,7 +34,8 @@ function nameBodyExists(req, res, next) {
 }
 
 /**
- * Get important request informations.
+ * @method getReqInformations
+ * Get user params request and index params request and set a new request attr.
  */
 function getReqInformations(req, _, next) {
   req.user = users[req.params.index];
@@ -42,7 +44,9 @@ function getReqInformations(req, _, next) {
 }
 
 /**
- * Validade if user exist.
+ * @method userExists
+ * Validade if user in index pass by request exist and call next procedure, else
+ * call a error.
  *
  * @return  error | call next router
  */
@@ -57,9 +61,10 @@ function userExists(req, res, next) {
 }
 
 /**
- * Push a new user on users array
+ * @method create_user
+ * Push a new user on users array.
  *
- * @return The new user added to user array.
+ * @return the username
  */
 function createUser(__userName) {
   users.push(__userName);
@@ -67,9 +72,13 @@ function createUser(__userName) {
 }
 
 /**
+ * @method updateUserName
  * Update the username.
  *
- * @return the new user name.
+ * @param __index - the index position where username will be changed.
+ * @param __userName - the new username to save.
+ *
+ * @return The new __username
  */
 function updateUserName(__index, __userName) {
   users[__index] = __userName;
@@ -77,47 +86,34 @@ function updateUserName(__index, __userName) {
 }
 
 /**
+ * @method deleteUser
  * Delete a user from users array.
  *
- * @return sucess
+ * @param __index - the index position to be deleted.
+ *
+ * @return sucess message
  */
 function deleteUser(__index) {
   users.splice(__index, 1);
   return 'sucess';
 }
 
-/**
- * List all users from users sample array
- *
- * @return  All users
- */
+// List all users
 routes.get('/users', (_, res) => {
   return res.json(users);
 });
 
-/**
- * Get a user from users array and show their name.
- *
- * @return  User name.
- */
+// List a user by index params
 routes.get('/users/:index', getReqInformations, userExists, (req, res) => {
   return res.json({ name: `${req.user}` });
 });
 
-/**
- * Add a new user.
- *
- * @return  New user name.
- */
+// Add a new user
 routes.post('/user/add', getReqInformations, nameBodyExists, (req, res) => {
   return res.json(createUser(req.userName));
 });
 
-/**
- * Search a user from index, and update their name.
- *
- * @return  New username.
- */
+// Update the username in index position
 routes.put(
   '/user/:index/edit',
   getReqInformations,
@@ -128,11 +124,7 @@ routes.put(
   }
 );
 
-/**
- * Router to delete an user from users sample array
- *
- * @return void
- */
+// Delete a user by index.
 routes.delete(
   '/user/:index/delete',
   getReqInformations,
