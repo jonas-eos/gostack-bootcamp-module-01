@@ -1,5 +1,5 @@
 // All dependencies are added on a variable with require method(<dependece-name>)
-import express from "express";
+import express from 'express';
 
 // Create a new object from express
 const server = express();
@@ -11,7 +11,7 @@ server.use(express.json());
 server.listen(3333);
 
 // User array sample
-const users = ["Jonas", "Diego", "Marcela", "Andressa"];
+const users = ['Jonas', 'Diego', 'Marcela', 'Andressa'];
 
 /**
  * Middleware::Log control purpose
@@ -19,10 +19,10 @@ const users = ["Jonas", "Diego", "Marcela", "Andressa"];
  * @return  void
  */
 server.use((req, _, next) => {
-  console.time("Request");
+  console.time('Request');
   console.log(`Method: ${req.method}; URL: ${req.url}`);
   next();
-  console.timeEnd("Request");
+  console.timeEnd('Request');
 });
 
 /**
@@ -37,7 +37,7 @@ function nameBodyExists(req, res, next) {
     return next();
   } else {
     return res.status(400).json({
-      error: "Username is required!"
+      error: 'Username is required!',
     });
   }
 }
@@ -61,7 +61,7 @@ function userExists(req, res, next) {
     return next();
   } else {
     return res.status(400).json({
-      error: "User does not exists!"
+      error: 'User does not exists!',
     });
   }
 }
@@ -93,7 +93,7 @@ function updateUserName(__index, __userName) {
  */
 function deleteUser(__index) {
   users.splice(__index, 1);
-  return "sucess";
+  return 'sucess';
 }
 
 /**
@@ -101,7 +101,7 @@ function deleteUser(__index) {
  *
  * @return  All users
  */
-server.get("/users", (req, res) => {
+server.get('/users', (req, res) => {
   return res.json(users);
 });
 
@@ -110,7 +110,7 @@ server.get("/users", (req, res) => {
  *
  * @return  User name.
  */
-server.get("/users/:index", getReqInformations, userExists, (req, res) => {
+server.get('/users/:index', getReqInformations, userExists, (req, res) => {
   return res.json({ name: `${req.user}` });
 });
 
@@ -119,7 +119,7 @@ server.get("/users/:index", getReqInformations, userExists, (req, res) => {
  *
  * @return  New user name.
  */
-server.post("/user/add", getReqInformations, nameBodyExists, (req, res) => {
+server.post('/user/add', getReqInformations, nameBodyExists, (req, res) => {
   return res.json(createUser(req.userName));
 });
 
@@ -129,7 +129,7 @@ server.post("/user/add", getReqInformations, nameBodyExists, (req, res) => {
  * @return  New username.
  */
 server.put(
-  "/user/:index/edit",
+  '/user/:index/edit',
   getReqInformations,
   userExists,
   nameBodyExists,
@@ -144,7 +144,7 @@ server.put(
  * @return void
  */
 server.delete(
-  "/user/:index/delete",
+  '/user/:index/delete',
   getReqInformations,
   userExists,
   (req, res) => {
